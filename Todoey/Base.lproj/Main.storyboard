@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="rpH-tH-GQN">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="dwI-mV-dj4">
     <device id="retina6_1" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -9,7 +9,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Todo List View Controller-->
+        <!--Todoey-->
         <scene sceneID="MQZ-6Z-51Y">
             <objects>
                 <tableViewController id="rpH-tH-GQN" customClass="TodoListViewController" customModule="Todoey" customModuleProvider="target" sceneMemberID="viewController">
@@ -32,10 +32,33 @@
                             <outlet property="delegate" destination="rpH-tH-GQN" id="bne-gR-sIZ"/>
                         </connections>
                     </tableView>
+                    <navigationItem key="navigationItem" title="Todoey" id="2kr-5u-ECT"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="xHj-uv-bVf" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-109" y="147"/>
+            <point key="canvasLocation" x="678" y="147"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="Uqr-1P-bee">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="dwI-mV-dj4" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="SUb-Mi-19O">
+                        <rect key="frame" x="0.0" y="44" width="414" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="barTintColor" red="0.0" green="0.32852089410000002" blue="0.57488495110000004" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <textAttributes key="titleTextAttributes">
+                            <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        </textAttributes>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="rpH-tH-GQN" kind="relationship" relationship="rootViewController" id="h6e-HJ-DbV"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="cZW-zC-pWm" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-110.14492753623189" y="146.65178571428569"/>
         </scene>
     </scenes>
 </document>
