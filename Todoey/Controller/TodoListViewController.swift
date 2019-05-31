@@ -7,17 +7,21 @@
 //
 
 import UIKit
+import CoreData
 
 class TodoListViewController: UITableViewController {
     
     var itemArray = [Item] ()
     
-   let documentURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("items.plist")
-   
+    
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        
+        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
+        
         loadData()
     }
     
@@ -29,7 +33,7 @@ class TodoListViewController: UITableViewController {
         
         let item = itemArray[indexPath.row]
         
-        cell.accessoryType = (item.checked ? .checkmark : .none)
+        cell.accessoryType = (item.done ? .checkmark : .none)
         
         cell.textLabel?.text = item.title
         
@@ -49,14 +53,35 @@ class TodoListViewController: UITableViewController {
         let cell = tableView.cellForRow(at: indexPath)
         
         let item = itemArray[indexPath.row]
-        item.checked = !item.checked
+        item.done = !item.done
         
-        cell?.accessoryType = item.checked ? .checkmark : .none
+        cell?.accessoryType = item.done ? .checkmark : .none
         
         saveDate()
         
         tableView.deselectRow(at: indexPath, animated: false)
         
+    }
+    
+    //TODO - delete on swipe
+//    override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+//        context.delete(itemArray[indexPath.row])
+//        itemArray.remove(at: indexPath.row)
+//
+//        saveDate()
+//    }
+    
+    override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+        let delete = UITableViewRowAction(style: .destructive, title: "Delete") {
+            action, index in
+            
+            self.context.delete(self.itemArray[indexPath.row])
+            self.itemArray.remove(at: indexPath.row)
+            self.saveDate()
+            
+        }
+        
+        return [delete]
     }
     
     
@@ -70,7 +95,12 @@ class TodoListViewController: UITableViewController {
         let action = UIAlertAction(title: "Submit Item", style: .default) { (alertAction) in
             
             if textfield.text != nil {
-                self.itemArray.append(Item(titleData: textfield.text!))
+                
+                let item = Item(context: self.context)
+                item.title = textfield.text!
+                item.done = false
+                
+                self.itemArray.append(item)
                 self.saveDate()
                 
             } else {
@@ -92,14 +122,12 @@ class TodoListViewController: UITableViewController {
     
     //MARK: Save Data into encoded file
     func saveDate(){
-        let encoder = PropertyListEncoder()
         
         do {
-            let data = try encoder.encode(itemArray)
-            try data.write(to: documentURL!)
+         try context.save()
         }
         catch {
-            print("Error found encoding. \(error)")
+            print("Error saving context \(error)")
         }
         
         tableView.reloadData()
@@ -108,14 +136,12 @@ class TodoListViewController: UITableViewController {
     //MARK: Load data into item Array from encoded plist file.
     func loadData(){
         
-        if let data = try? Data(contentsOf: documentURL!) {
-            let decoder = PropertyListDecoder()
-            do {
-                itemArray = try decoder.decode([Item].self, from: data)
-            }
-            catch {
-                print("Error decoding \(error)")
-            }
+        let request : NSFetchRequest<Item> = Item.fetchRequest()
+        
+        do {
+            itemArray = try context.fetch(request)
+        } catch {
+            print("request error /(error)")
         }
         
     }
