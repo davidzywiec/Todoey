@@ -10,16 +10,15 @@ import UIKit
 
 class TodoListViewController: UITableViewController {
     
-    var itemArray = ["Item1","Item2","Item3"]
+    var itemArray = [Item] ()
     
-    let defaults = UserDefaults.standard
+   let documentURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("items.plist")
+   
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        if let items = defaults.array(forKey: "itemArrayTodoey") as? [String] {
-            itemArray = items
-        }
+        loadData()
     }
     
     //MARK - Tableview Datasource Method
@@ -28,7 +27,11 @@ class TodoListViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCell", for: indexPath)
         
-        cell.textLabel?.text = itemArray[indexPath.row]
+        let item = itemArray[indexPath.row]
+        
+        cell.accessoryType = (item.checked ? .checkmark : .none)
+        
+        cell.textLabel?.text = item.title
         
         return cell
         
@@ -45,14 +48,14 @@ class TodoListViewController: UITableViewController {
         
         let cell = tableView.cellForRow(at: indexPath)
         
+        let item = itemArray[indexPath.row]
+        item.checked = !item.checked
         
-        if cell?.accessoryType == UITableViewCell.AccessoryType.none {
-            cell?.accessoryType = .checkmark
-        } else {
-            cell?.accessoryType = .none
-        }
+        cell?.accessoryType = item.checked ? .checkmark : .none
         
-        tableView.deselectRow(at: indexPath, animated: true)
+        saveDate()
+        
+        tableView.deselectRow(at: indexPath, animated: false)
         
     }
     
@@ -66,12 +69,10 @@ class TodoListViewController: UITableViewController {
         
         let action = UIAlertAction(title: "Submit Item", style: .default) { (alertAction) in
             
-            
             if textfield.text != nil {
-                self.itemArray.append(textfield.text!)
-                self.tableView.reloadData()
-                self.defaults.set(self.itemArray, forKey: "itemArrayTodoey")
-
+                self.itemArray.append(Item(titleData: textfield.text!))
+                self.saveDate()
+                
             } else {
                 print("No value input")
             }
@@ -87,12 +88,38 @@ class TodoListViewController: UITableViewController {
         
         present(alert, animated: true, completion: nil)
         
+    }
+    
+    //MARK: Save Data into encoded file
+    func saveDate(){
+        let encoder = PropertyListEncoder()
         
+        do {
+            let data = try encoder.encode(itemArray)
+            try data.write(to: documentURL!)
+        }
+        catch {
+            print("Error found encoding. \(error)")
+        }
+        
+        tableView.reloadData()
+    }
+    
+    //MARK: Load data into item Array from encoded plist file.
+    func loadData(){
+        
+        if let data = try? Data(contentsOf: documentURL!) {
+            let decoder = PropertyListDecoder()
+            do {
+                itemArray = try decoder.decode([Item].self, from: data)
+            }
+            catch {
+                print("Error decoding \(error)")
+            }
+        }
         
     }
     
-    
-
-
+ 
 }
 
